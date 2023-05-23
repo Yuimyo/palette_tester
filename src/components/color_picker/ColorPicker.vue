@@ -12,7 +12,7 @@ const blue = ref(0);
 const hue = ref(0);
 const saturation = ref(0);
 const brightness = ref(0);
-const colorCode = ref("#0d0d0d");
+const colorCode = ref("#000000");
 const textColorCode = ref("#f2f2f2");
 
 const onRgbChanged = () => {
