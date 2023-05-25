@@ -10,23 +10,25 @@ defineComponent({
   },
 });
 
+const emit = defineEmits<{
+  (e: "onColorIdChanged", value: number): void;
+}>();
+
 let minColorId = 0;
 let maxColorId = 8;
 let colorId = 0;
-const colors = ref([
-  { id: colorId++, code: "#ffffff" },
-  { id: colorId++, code: "#00ffff" },
-  { id: colorId++, code: "#00ffff" },
-]);
 
-const addColor = () => {
+const colorDetails = ref<{ id: number; color: Color }[]>([]);
+
+const addColor = (color: Color) => {
   if (colorId >= maxColorId) return;
-  colors.value.push({ id: colorId++, code: "#00ffff" });
+  colorDetails.value.push({ id: colorId, color: color });
+  colorId++;
 };
 
 const removeColor = () => {
   if (colorId <= minColorId) return;
-  colors.value.pop();
+  colorDetails.value.pop();
   colorId--;
 };
 
@@ -35,18 +37,18 @@ let colorCircleRefs: ComputedRef<(InstanceType<typeof ColorCircle> | null)[]> =
 
 const ReloadPalettes = (codes: string[]) => {
   colorId = 0;
-  colors.value = [];
+  colorDetails.value = [];
   for (let i = 0; i < codes.length; i++) {
     const code = codes[i];
-    colors.value.push({ id: colorId++, code: code });
+    addColor(Color.FromCode(code));
   }
-  for (let i = 0; i < colors.value.length; i++) {
-    colorCircleRefs.value[i]?.SetColor(Color.FromCode(colors.value[i].code));
+  for (let i = 0; i < colorDetails.value.length; i++) {
+    colorCircleRefs.value[i]?.SetColor(colorDetails.value[i].color);
   }
 };
 
 const clickPlus = () => {
-  addColor();
+  addColor(new Color(0, 0, 0));
 };
 
 const clickMinus = () => {
@@ -69,8 +71,9 @@ defineExpose({
       class="inline-block m-2 p-2 bg-neutral-50 shadow-lg shadow-stone-300 rounded-lg border-0 border-emerald-600"
     >
       <div class="flex">
-        <div v-for="color in colors" :key="color.id">
-          <ColorCircle :code="color.code" :ref="skipUnwrap.colorCircleRef" />
+        <div v-for="colorDetail in colorDetails" :key="colorDetail.id">
+          <ColorCircle :ref="skipUnwrap.colorCircleRef" />
+          <!--  :on-value-changed="" -->
         </div>
         <button
           class="w-4 hover:bg-neutral-100 active:bg-neutral-200 focus:outline-dotted focus:outline-1 focus:outline-violet-300"

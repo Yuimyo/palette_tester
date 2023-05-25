@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { RgbToHsv, HsvToRgb, RgbToCode, CodeToRgb } from "@/lib/ColorHelper";
+import { Color } from "@/lib/Color";
 
 const emit = defineEmits<{
-  (e: "onChanged", code: string): void;
+  (e: "onChanged", color: Color): void;
 }>();
+
+const SetColor = (color: Color) => {
+  reflesh(color, true, true);
+};
 
 const red = ref(0);
 const green = ref(0);
@@ -12,66 +16,79 @@ const blue = ref(0);
 const hue = ref(0);
 const saturation = ref(0);
 const brightness = ref(0);
-const colorCode = ref("#000000");
-const textColorCode = ref("#f2f2f2");
+const colorCode = ref("");
+const textColorCode = ref("");
 
-const onRgbChanged = () => {
-  let hsv = RgbToHsv(red.value / 255, green.value / 255, blue.value / 255);
-  hue.value = Math.round(hsv[0]);
-  saturation.value = Math.round(hsv[1] * 100.0);
-  brightness.value = Math.round(hsv[2] * 100.0);
-  changeColorCode();
-};
+// initialize.
+reflesh(new Color(0, 0, 0), true, true);
 
-const onHsvChanged = () => {
-  let rgb = HsvToRgb(hue.value, saturation.value / 100, brightness.value / 100);
-  red.value = Math.round(rgb[0] * 255.0);
-  green.value = Math.round(rgb[1] * 255.0);
-  blue.value = Math.round(rgb[2] * 255.0);
-  changeColorCode();
-};
-
-const onColorCodeChanged = () => {
-  let rgb: [r: number, g: number, b: number] = [0, 0, 0];
-  let currentCode = RgbToCode(
-    red.value / 255,
-    green.value / 255,
-    blue.value / 255
-  );
-  try {
-    rgb = CodeToRgb(colorCode.value);
-  } catch (err) {
-    rgb = CodeToRgb(currentCode);
-    colorCode.value = currentCode;
-  }
-  red.value = rgb[0];
-  green.value = rgb[1];
-  blue.value = rgb[2];
-  onRgbChanged();
-  changeColorCode();
-};
-
-function changeColorCode() {
-  colorCode.value = RgbToCode(
-    red.value / 255.0,
-    green.value / 255.0,
-    blue.value / 255.0
-  );
-  reloadTextColorCode();
-  emit("onChanged", colorCode.value);
+function fromRgb(): Color {
+  return new Color(red.value / 255.0, green.value / 255.0, blue.value / 255.0);
 }
 
-function reloadTextColorCode() {
-  let r = red.value / 255.0;
-  let g = green.value / 255.0;
-  let b = blue.value / 255.0;
-  let luminance = 0.298912 * r + 0.586611 * g + 0.114478 * b;
-  if (luminance > 0.5) {
+function fromHsv(): Color {
+  return Color.FromHsv(
+    hue.value,
+    saturation.value / 100,
+    brightness.value / 100
+  );
+}
+
+function reflesh(color: Color, resetRgb: boolean, resetHsv: boolean) {
+  resetColor(color, resetRgb, resetHsv);
+  resetColorCode(color);
+  resetTextColorCode(color);
+  emit("onChanged", color);
+}
+
+function resetColor(color: Color, resetRgb: boolean, resetHsv: boolean) {
+  if (resetRgb) {
+    red.value = Math.round(color.R * 255.0);
+    green.value = Math.round(color.G * 255.0);
+    blue.value = Math.round(color.B * 255.0);
+  }
+  if (resetHsv) {
+    let hsv = color.ToHsv();
+    hue.value = Math.round(hsv[0]);
+    saturation.value = Math.round(hsv[1] * 100.0);
+    brightness.value = Math.round(hsv[2] * 100.0);
+  }
+}
+
+function resetColorCode(color: Color) {
+  colorCode.value = color.ToCode();
+}
+
+function resetTextColorCode(color: Color) {
+  if (color.GetLuminance() > 0.5) {
     textColorCode.value = "#0d0d0d";
   } else {
     textColorCode.value = "#f2f2f2";
   }
 }
+
+const onRgbChanged = () => {
+  reflesh(fromRgb(), false, true);
+};
+
+const onHsvChanged = () => {
+  reflesh(fromHsv(), true, false);
+};
+
+const onColorCodeChanged = () => {
+  let nextColor: Color = new Color(0, 0, 0);
+  let currentCode = fromRgb().ToCode();
+  try {
+    nextColor = Color.FromCode(colorCode.value);
+  } catch (err) {
+    nextColor = Color.FromCode(currentCode);
+  }
+  reflesh(nextColor, true, true);
+};
+
+defineExpose({
+  SetColor,
+});
 </script>
 
 <template>

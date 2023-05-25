@@ -2,6 +2,7 @@
 import { defineComponent, ref, computed, ComputedRef, onMounted } from "vue";
 import ColorPicker from "@/components/color_picker/ColorPicker.vue";
 import PaletteViewer from "@/components/color_picker/PaletteViewer.vue";
+import { Palette } from "@/lib/Palette";
 
 defineComponent({
   name: "AboutView",
@@ -12,7 +13,7 @@ defineComponent({
 });
 
 let colorId = 0;
-const colors = ref([
+const colorDetails = ref([
   { id: colorId++, code: "#000000" },
   { id: colorId++, code: "#000000" },
   { id: colorId++, code: "#000000" },
@@ -24,11 +25,24 @@ const colors = ref([
 ]);
 
 let paletteId = 0;
-const palettes = ref([
-  { id: paletteId++, colors: [0, 1, 2] },
-  { id: paletteId++, colors: [1, 2, 3] },
-  { id: paletteId++, colors: [2, 3, 4] },
-  { id: paletteId++, colors: [3, 4, 5] },
+const paletteDetails = ref([
+  { id: paletteId++, colors: [0, 1] },
+  { id: paletteId++, colors: [3, 5] },
+  { id: paletteId++, colors: [7, 0] },
+  { id: paletteId++, colors: [2, 3] },
+  { id: paletteId++, colors: [5, 6] },
+  { id: paletteId++, colors: [1, 2] },
+  { id: paletteId++, colors: [5, 4] },
+  { id: paletteId++, colors: [7, 4] },
+  { id: paletteId++, colors: [0, 4] },
+  { id: paletteId++, colors: [1, 4] },
+  { id: paletteId++, colors: [3, 4] },
+  { id: paletteId++, colors: [6, 7] },
+  { id: paletteId++, colors: [0, 3] },
+  { id: paletteId++, colors: [1, 5] },
+  { id: paletteId++, colors: [3, 6] },
+  { id: paletteId++, colors: [5, 0] },
+  { id: paletteId++, colors: [6, 1] },
   // { id: paletteId++, colors: [4, 5, 6] },
   // { id: paletteId++, colors: [5, 6, 7] },
   // { id: paletteId++, colors: [6, 7, 0] },
@@ -58,10 +72,10 @@ function colorIdsToCodes(colorIds: number[]): string[] {
     const id = colorIds[i];
     let exist = false;
     let code = "#000000";
-    for (let j = 0; j < colors.value.length; j++) {
-      if (colors.value[j].id == id) {
+    for (let j = 0; j < colorDetails.value.length; j++) {
+      if (colorDetails.value[j].id == id) {
         exist = true;
-        code = colors.value[j].code;
+        code = colorDetails.value[j].code;
         break;
       }
     }
@@ -79,9 +93,9 @@ let paletteRefs: ComputedRef<(InstanceType<typeof PaletteViewer> | null)[]> =
 
 function reloadPalettes() {
   if (paletteRefs.value == undefined) return;
-  for (let i = 0; i < palettes.value.length; i++) {
+  for (let i = 0; i < paletteDetails.value.length; i++) {
     paletteRefs.value[i]?.ReloadPalettes(
-      colorIdsToCodes(palettes.value[i].colors)
+      colorIdsToCodes(paletteDetails.value[i].colors)
     );
   }
 }
@@ -99,16 +113,16 @@ onMounted(() => {
 <template>
   <div class="flex">
     <div class="m-4">
-      <div v-for="palette in palettes" :key="palette.id">
+      <div v-for="palette in paletteDetails" :key="palette.id">
         <PaletteViewer :ref="skipUnwrap.paletteRef" />
       </div>
     </div>
     <div>
-      <div v-for="color in colors" :key="color.id">
+      <div v-for="colorDetail in colorDetails" :key="colorDetail.id">
         <ColorPicker
           @onChanged="
-            (code) => {
-              colors[color.id].code = code;
+            (color) => {
+              colorDetails[colorDetail.id].code = color.ToCode();
               reloadPalettes();
             }
           "

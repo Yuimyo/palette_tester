@@ -65,6 +65,10 @@ export class Color {
     return new Color(r / 255.0, g / 255.0, b / 255.0);
   }
 
+  public GetLuminance(): number {
+    return 0.298912 * this.R + 0.586611 * this.G + 0.114478 * this.B;
+  }
+
   /**
    * 色情報について、HSV に変換します。
    * h ∈ [0, 360), s, v ∈ [0, 1]
