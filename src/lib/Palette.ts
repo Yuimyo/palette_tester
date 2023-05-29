@@ -21,7 +21,6 @@ export class MonoColor implements IColorSource {
   }
   setColor(color: Color) {
     this.value = color;
-    console.log(`set: ${this.value.ToCode()} ${this.rand}`);
     const myEvent = new CustomEvent<ColorSourceOnChangedEventType>(
       "onChanged",
       {

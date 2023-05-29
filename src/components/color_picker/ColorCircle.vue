@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { ref, watch, toRef, PropType } from "vue";
+import { ref } from "vue";
 import { Color } from "@/lib/Color";
-import { IColorSource, MonoColor } from "@/lib/Palette";
 
 // TODO: 初期色値は？
+const props = defineProps({
+  defaultColor: {
+    type: Color,
+    required: true,
+  },
+  defaultText: {
+    type: String,
+    required: true,
+  },
+});
 
 const emit = defineEmits<{
   (e: "ClickedUp"): void;
   (e: "ClickedDown"): void;
 }>();
 
-const text = ref("0");
-const backgroundColor = ref(new Color(0, 0, 0));
-const textColorCode = ref("#f2f2f2");
+const backgroundColor = ref(props.defaultColor);
+const text = ref(props.defaultText);
 
-const ResetColor = (color: Color) => {
-  backgroundColor.value = color;
-  resetTextColorCode(color);
-};
-const ResetText = (input: string) => {
-  text.value = input;
-};
-
-function resetTextColorCode(color: Color) {
+function calcTextColorCode(color: Color): string {
   if (color.GetLuminance() > 0.5) {
-    textColorCode.value = "#0d0d0d";
+    return "#0d0d0d";
   } else {
-    textColorCode.value = "#f2f2f2";
+    return "#f2f2f2";
   }
 }
 
@@ -36,6 +36,14 @@ const clickPlus = () => {
 
 const clickMinus = () => {
   emit("ClickedUp");
+};
+
+const ResetColor = (color: Color) => {
+  backgroundColor.value = color;
+};
+
+const ResetText = (input: string) => {
+  text.value = input;
 };
 
 defineExpose({
@@ -86,6 +94,6 @@ defineExpose({
   /* background-color: v-bind(value.ToCode()); */
 }
 #textcolor {
-  color: v-bind(textColorCode);
+  color: v-bind(calcTextColorCode(backgroundColor));
 }
 </style>

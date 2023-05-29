@@ -103,7 +103,9 @@ defineExpose({
 </script>
 
 <template>
-  <div class="inline-block border-0 border-emerald-600 mt-1 mb-1 ml-6 mr-6">
+  <div
+    class="inline-block border-0 border-emerald-600 m-2 p-2 bg-neutral-50 shadow-lg shadow-stone-400 rounded-lg"
+  >
     <div class="flex items-center gap-4">
       <div>
         <div
@@ -120,73 +122,6 @@ defineExpose({
         </div>
       </div>
       <div class="flex items-center gap-4 border-0 border-emerald-600 m-1">
-        <div>
-          <div class="grid grid-rows-3 gap-1">
-            <div class="inline-block">
-              <div class="flex items-center flex-row gap-1">
-                R
-                <input
-                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
-                  type="number"
-                  min="0"
-                  max="255"
-                  v-model="red"
-                  @input="onRgbChanged"
-                />
-                <input
-                  class="w-48"
-                  type="range"
-                  min="0"
-                  max="255"
-                  v-model="red"
-                  @input="onRgbChanged"
-                />
-              </div>
-            </div>
-            <div class="inline-block">
-              <div class="flex items-center flex-row gap-1">
-                G
-                <input
-                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
-                  type="number"
-                  min="0"
-                  max="255"
-                  v-model="green"
-                  @input="onRgbChanged"
-                />
-                <input
-                  class="w-48"
-                  type="range"
-                  min="0"
-                  max="255"
-                  v-model="green"
-                  @input="onRgbChanged"
-                />
-              </div>
-            </div>
-            <div class="inline-block">
-              <div class="flex items-center flex-row gap-1">
-                B
-                <input
-                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
-                  type="number"
-                  min="0"
-                  max="255"
-                  v-model="blue"
-                  @input="onRgbChanged"
-                />
-                <input
-                  class="w-48"
-                  type="range"
-                  min="0"
-                  max="255"
-                  v-model="blue"
-                  @input="onRgbChanged"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
         <div>
           <div class="grid grid-rows-3 gap-1">
             <div class="inline-block">
@@ -249,6 +184,73 @@ defineExpose({
                   max="100"
                   v-model="brightness"
                   @input="onHsvChanged"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="grid grid-rows-3 gap-1">
+            <div class="inline-block">
+              <div class="flex items-center flex-row gap-1">
+                R
+                <input
+                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
+                  type="number"
+                  min="0"
+                  max="255"
+                  v-model="red"
+                  @input="onRgbChanged"
+                />
+                <input
+                  class="w-48"
+                  type="range"
+                  min="0"
+                  max="255"
+                  v-model="red"
+                  @input="onRgbChanged"
+                />
+              </div>
+            </div>
+            <div class="inline-block">
+              <div class="flex items-center flex-row gap-1">
+                G
+                <input
+                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
+                  type="number"
+                  min="0"
+                  max="255"
+                  v-model="green"
+                  @input="onRgbChanged"
+                />
+                <input
+                  class="w-48"
+                  type="range"
+                  min="0"
+                  max="255"
+                  v-model="green"
+                  @input="onRgbChanged"
+                />
+              </div>
+            </div>
+            <div class="inline-block">
+              <div class="flex items-center flex-row gap-1">
+                B
+                <input
+                  class="border border-gray-300 w-12 text-sm rounded-lg block p-0.5"
+                  type="number"
+                  min="0"
+                  max="255"
+                  v-model="blue"
+                  @input="onRgbChanged"
+                />
+                <input
+                  class="w-48"
+                  type="range"
+                  min="0"
+                  max="255"
+                  v-model="blue"
+                  @input="onRgbChanged"
                 />
               </div>
             </div>
