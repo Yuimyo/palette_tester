@@ -1,82 +1,113 @@
 import { Color } from "@/lib/Color";
 import { CustomEventEmitter } from "@/lib/CustomEventEmitter";
 
-export interface MonoColorOnChangedEvent extends Event {
-  detail: MonoColorOnChangedEventType;
+export interface ColorSourceOnChangedEvent extends Event {
+  detail: ColorSourceOnChangedEventType;
 }
-export type MonoColorOnChangedEventType = {
-  value: MonoColor;
+export type ColorSourceOnChangedEventType = {
+  value: Color;
 };
 
 export class MonoColor implements IColorSource {
-  value: Color = new Color(0, 0, 0);
+  private value: Color = new Color(0, 0, 0);
+
+  rand: number;
+  constructor() {
+    this.rand = Math.random();
+  }
+
   getColor(): Color {
     return this.value;
   }
   setColor(color: Color) {
-    const myEvent = new CustomEvent<MonoColorOnChangedEventType>("onChanged", {
-      detail: {
-        value: this,
-      },
-    });
-    this.onChangedEvent.dispatchEvent("onChanged", myEvent);
+    this.value = color;
+    console.log(`set: ${this.value.ToCode()} ${this.rand}`);
+    const myEvent = new CustomEvent<ColorSourceOnChangedEventType>(
+      "onChanged",
+      {
+        detail: {
+          value: this.getColor(),
+        },
+      }
+    );
+    this.onChanged.dispatchEvent(myEvent);
   }
 
   // reflesh() {
   //   throw new Error("Not implemented.");
   // }
 
-  private onChangedEvent = new CustomEventEmitter<MonoColorOnChangedEvent>();
-  addEventOnChanged(listener: (event: MonoColorOnChangedEvent) => void) {
-    this.onChangedEvent.addEventListener("onChanged", listener);
-  }
-  removeEventOnChanged(listener: (event: MonoColorOnChangedEvent) => void) {
-    this.onChangedEvent.removeEventListener("onChanged", listener);
-  }
+  readonly onChanged: CustomEventEmitter<ColorSourceOnChangedEvent> =
+    new CustomEventEmitter<ColorSourceOnChangedEvent>();
 }
 
-interface IColorSource {
+export type IColorSource = {
   getColor(): Color;
   setColor(color: Color): void;
-  addEventOnChanged(listener: (event: Event) => void): void;
-  removeEventOnChanged(listener: (event: Event) => void): void;
   // reflesh(): void;
-}
+  rand: number;
+};
+
+export type PaletteOnValueChangedEventType = {
+  palette: Palette;
+  index: number;
+  clickType: string;
+};
 
 export interface PaletteOnChangedEvent extends Event {
   detail: PaletteOnChangedEventType;
 }
+
+// push, replace: index
+// remove: -1
 export type PaletteOnChangedEventType = {
-  value: Palette;
+  index: number;
+  values: Color[];
 };
 
 export class Palette {
-  datas: IColorSource[] = [];
+  private datas: Color[] = [];
   get length(): number {
     return this.datas.length;
   }
-  push(source: IColorSource) {
-    this.datas.push(source);
+  get(index: number): Color {
+    return this.datas[index];
   }
-  replace(index: number, source: IColorSource) {
-    this.datas[index] = source;
+  push(color: Color) {
+    this.datas.push(color);
+    this.onChanged.dispatchEvent(
+      new CustomEvent<PaletteOnChangedEventType>("onChanged", {
+        detail: { index: this.length - 1, values: this.datas },
+      })
+    );
+  }
+  replace(index: number, color: Color) {
+    this.datas[index] = color;
+    this.onChanged.dispatchEvent(
+      new CustomEvent<PaletteOnChangedEventType>("onChanged", {
+        detail: { index: index, values: this.datas },
+      })
+    );
+  }
+
+  pop() {
+    this.remove(this.length - 1);
   }
   remove(index: number) {
     if (index < 0) throw new Error(`This index (${index}) is not exist.`);
     this.datas.splice(index, 1);
+    this.onChanged.dispatchEvent(
+      new CustomEvent<PaletteOnChangedEventType>("onChanged", {
+        detail: { index: -1, values: this.datas },
+      })
+    );
   }
+
+  readonly onChanged: CustomEventEmitter<PaletteOnChangedEvent> =
+    new CustomEventEmitter<PaletteOnChangedEvent>();
 
   reflesh() {
     throw new Error("Not implemented.");
-  }
-
-  // ColorCircleに伝えてやる
-  private onChangedEvent = new CustomEventEmitter<PaletteOnChangedEvent>();
-  addEventOnChanged(listener: (event: PaletteOnChangedEvent) => void) {
-    this.onChangedEvent.addEventListener("onChanged", listener);
-  }
-  removeEventOnChanged(listener: (event: PaletteOnChangedEvent) => void) {
-    this.onChangedEvent.removeEventListener("onChanged", listener);
   }
 }
 

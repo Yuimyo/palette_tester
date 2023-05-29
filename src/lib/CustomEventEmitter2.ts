@@ -50,6 +50,10 @@ class InternalEventContainer<TEvent extends Event> extends EventContainer {
     this.action = action;
   }
 
+  // 型のある言語なら、ここで型違いを弾けばよかったが…
+  // JavaScript/TypeScriptでは、構造体の型判別は意外とややこしいようだ
+  // そういう型違いを弾くために型毎の異なる実装が必要になることが分かった
+  // ここがボトルネックとなり、CustomEventEmitter2は没とすることにした。
   public act(event: Event) {
     const convertedEvent: TEvent = event as TEvent;
     if (convertedEvent == null) return;

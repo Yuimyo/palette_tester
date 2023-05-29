@@ -1,6 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, toRef, PropType } from "vue";
 import { Color } from "@/lib/Color";
+import { Palette, IColorSource } from "@/lib/Palette";
+
+const props = defineProps({
+  colorSource: {
+    type: Object as PropType<IColorSource>,
+    required: true,
+  },
+});
+
+const colorSource = toRef(props.colorSource);
 
 const emit = defineEmits<{
   (e: "onChanged", color: Color): void;
@@ -38,6 +48,7 @@ function reflesh(color: Color, resetRgb: boolean, resetHsv: boolean) {
   resetColor(color, resetRgb, resetHsv);
   resetColorCode(color);
   resetTextColorCode(color);
+  colorSource.value.setColor(color);
   emit("onChanged", color);
 }
 

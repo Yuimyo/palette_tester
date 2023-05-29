@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, toRef, PropType } from "vue";
 import { Color } from "@/lib/Color";
+import { IColorSource, MonoColor } from "@/lib/Palette";
+
+// TODO: 初期色値は？
 
 const emit = defineEmits<{
-  (e: "ValueChanged", value: number): void;
+  (e: "ClickedUp"): void;
+  (e: "ClickedDown"): void;
 }>();
 
-const numberMin = 1;
-const numberMax = 8;
-const number = ref(1);
-const value = ref(new Color(0, 0, 0));
+const text = ref("0");
+const backgroundColor = ref(new Color(0, 0, 0));
 const textColorCode = ref("#f2f2f2");
 
-const SetColor = (color: Color) => {
-  value.value = color;
+const ResetColor = (color: Color) => {
+  backgroundColor.value = color;
   resetTextColorCode(color);
+};
+const ResetText = (input: string) => {
+  text.value = input;
 };
 
 function resetTextColorCode(color: Color) {
@@ -25,26 +30,17 @@ function resetTextColorCode(color: Color) {
   }
 }
 
-watch(number, (value) => {
-  emit("ValueChanged", value);
-});
-
-const onChange = () => {
-  throw new Error("NotImple");
-};
-
 const clickPlus = () => {
-  if (number.value >= numberMax) return;
-  number.value++;
+  emit("ClickedDown");
 };
 
 const clickMinus = () => {
-  if (number.value <= numberMin) return;
-  number.value--;
+  emit("ClickedUp");
 };
 
 defineExpose({
-  SetColor,
+  ResetColor,
+  ResetText,
 });
 </script>
 
@@ -59,7 +55,7 @@ defineExpose({
           <div
             class="flex pointer-events-none z-20 justify-center items-center absolute w-full h-full"
           >
-            <p id="textcolor">{{ number }}</p>
+            <p id="textcolor">{{ text }}</p>
           </div>
           <div
             id="filledcolor"
@@ -86,7 +82,8 @@ defineExpose({
 
 <style scoped>
 #filledcolor {
-  background-color: v-bind(value.ToCode());
+  background-color: v-bind(backgroundColor.ToCode());
+  /* background-color: v-bind(value.ToCode()); */
 }
 #textcolor {
   color: v-bind(textColorCode);

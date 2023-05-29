@@ -1,9 +1,9 @@
 export class Color {
   public static readonly DEFAULT: Color = new Color(0, 0, 0);
 
-  public R = 0;
-  public G = 0;
-  public B = 0;
+  public readonly R: number = 0;
+  public readonly G: number = 0;
+  public readonly B: number = 0;
 
   /**
    * r, g, b ∈ [0, 1]
@@ -12,6 +12,10 @@ export class Color {
     this.R = r;
     this.G = g;
     this.B = b;
+  }
+
+  public copy(): Color {
+    return new Color(this.R, this.G, this.B);
   }
 
   /**
